@@ -108,8 +108,8 @@ function [SS, exitflag, residual] = getSS(IC, sex, params, varargin)
         grid on
         yLimits = ylim;
         yDiff = diff(yLimits);
-        if yDiff < 1
-            ylim([yLimits(1) - 0.5 yLimits(1)+0.5])
+        if yDiff < 2
+            ylim([yLimits(1) - 1 yLimits(1)+1])
         end
 
         subplot(nrows,ncols,5)

@@ -5,15 +5,15 @@ clear all; close all;
 %--------------------
 % User input
 %--------------------
-MealInsulin = 1; % set to 0 for no insulin
-Kamt = 0 %35; % amount of K in meal
+MealInsulin = 1;  % set to 0 for no insulin
+Kamt = 35; % amount of K in meal
 
 meal_len = 30; % length of meal in minutes
 % muscle-kidney cross talk options
 MKX = 0; MKXslope = 0; 
 
 sex = 0; % male
-% sex = 1; % female
+%sex = 1; % female
 %-------------------
 % End of user input
 %-------------------
@@ -24,7 +24,11 @@ pars = set_params(sex);
 [params, parnames] = pars2vector(pars,0);
 
 %% set initial conditions
-temp = load('./SS/SS_4vars.mat');
+if sex == 0 % male
+    temp = load('./SS/SS_5vars_male.mat');
+elseif sex == 1 % female
+    temp = load('./SS/SS_5vars_female.mat');
+end
 SS = temp.SS;
 [IC, ~, ~] = getSS(SS, sex, params, 'do_figs', 0); % start at SS
 
@@ -49,10 +53,10 @@ fprintf('solving ODEs \n')
                             'Kintake', 0), ...
                             tspan, IC, options);
 
-% vals1 = compute_vars(t1,y1,params,...
-%                         'do_insulin', do_insulin,...
-%                         'do_FF', do_FF,...
-%                         'do_MKX', [MKX, MKXslope]);
+vals1 = compute_kidney_vars(y1,params,...
+                        'do_insulin', do_insulin,...
+                        'do_FF', do_FF,...
+                        'do_MKX', [MKX, MKXslope]);
 
 %% add a meal with glucose
 % NOTE: need to restart t from 0 to get insulin dynamics, shift later
@@ -70,12 +74,12 @@ do_insulin = MealInsulin; % add glucose componenent
                             'Kintake', Kintake), ...
                             tspan, IC, options);
 
-% vals2 = compute_vars(t2,y2,params,...
-%                         'do_insulin', do_insulin,...
-%                         'do_FF', do_FF,...
-%                         'do_MKX', [MKX, MKXslope]);
+vals2 = compute_kidney_vars(y2,params,...
+                        'do_insulin', do_insulin,...
+                        'do_FF', do_FF,...
+                        'do_MKX', [MKX, MKXslope]);
 
-t2 = t2 + t1(end); % shift by t1
+
 
 % done K intake
 IC = y2(end,:);
@@ -92,13 +96,15 @@ Kintake = 0; % back to fasting state
                             tspan, IC, options);
 
 
-% vals3 = compute_vars(t3,y3,params,...
-%                         'do_insulin', do_insulin,...
-%                         'do_FF', do_FF,...
-%                         'do_MKX', [MKX, MKXslope]);
+vals3 = compute_kidney_vars(y3,params,...
+                        'do_insulin', do_insulin,...
+                        'do_FF', do_FF,...
+                        'do_MKX', [MKX, MKXslope]);
 
 
-t3 = t3 + t1(end); % shift by t1
+% Shift t2 and t3
+t2 = t2 + t1(end); % shift by t1
+t3 = t3 + t2(end); % shift by t1
 
 
 % Full simulation pieced together
@@ -158,13 +164,13 @@ xlabel('t', 'fontsize', f.xlab)
 title('Muscle K', 'fontsize', f.title)
 grid on
 
-% subplot(nrows,ncols,5)
-% hold on
-% plot(t,y(:,5),'linewidth',lw,'color',c2, 'linestyle',ls2)
-% ylabel('N_{al}', 'fontsize', f.ylab)
-% xlabel('t', 'fontsize', f.xlab)
-% title('Normalized ALD', 'fontsize', f.title)
-% grid on
+subplot(nrows,ncols,5)
+hold on
+plot(t,y(:,5),'linewidth',lw,'color',c2, 'linestyle',ls2)
+ylabel('N_{al}', 'fontsize', f.ylab)
+xlabel('t', 'fontsize', f.xlab)
+title('Normalized ALD', 'fontsize', f.title)
+grid on
 
 % concentrations
 figure(2)
@@ -209,6 +215,7 @@ if save_sim
     fname = strcat('./MealSim/', date, '_driverMeal', ...
                     '_insulin-',num2str(MealInsulin),...
                     '_Kin-', num2str(Kamt), ...
+                    '_sex-', num2str(sex),...
                     '_notes-', notes, ...
                     '.mat');
     save(fname, 't', 'y', ...
