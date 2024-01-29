@@ -64,6 +64,15 @@ function [SS, exitflag, residual] = getSS(IC, sex, params, varargin)
         xlabel('t', 'fontsize', f.xlab)
         title('Gut K', 'fontsize', f.title)
         grid on
+        % Get the current y-axis limits
+        yLimits = ylim;
+        % Calculate the difference between the maximum and minimum
+        yDiff = diff(yLimits);
+        % If the difference is less than 1, adjust the maximum limit
+        if yDiff < 1
+        % Set the new y-axis limits
+            ylim([yLimits(1) yLimits(1)+1]);
+        end
         
         subplot(nrows,ncols,2)
         plot(t,y(:,2),'linewidth',lw,'color',c1)
@@ -71,6 +80,12 @@ function [SS, exitflag, residual] = getSS(IC, sex, params, varargin)
         xlabel('t', 'fontsize', f.xlab)
         title('Plasma K', 'fontsize', f.title)
         grid on
+        yLimits = ylim;
+        yDiff = diff(yLimits);
+        if yDiff < 1
+            ylim([yLimits(1) - 0.5 yLimits(1)+0.5])
+        end
+
         
         subplot(nrows,ncols,3)
         plot(t,y(:,3),'linewidth',lw,'color',c1)
@@ -78,6 +93,12 @@ function [SS, exitflag, residual] = getSS(IC, sex, params, varargin)
         xlabel('t', 'fontsize', f.xlab)
         title('Interstitial K', 'fontsize', f.title)
         grid on
+        yLimits = ylim;
+        yDiff = diff(yLimits);
+        if yDiff < 1
+            ylim([yLimits(1) - 0.5 yLimits(1)+0.5])
+        end
+
         
         subplot(nrows,ncols,4)
         plot(t,y(:,4),'linewidth',lw,'color',c1)
@@ -85,6 +106,23 @@ function [SS, exitflag, residual] = getSS(IC, sex, params, varargin)
         xlabel('t', 'fontsize', f.xlab)
         title('Muscle K', 'fontsize', f.title)
         grid on
+        yLimits = ylim;
+        yDiff = diff(yLimits);
+        if yDiff < 2
+            ylim([yLimits(1) - 1 yLimits(1)+1])
+        end
+
+        subplot(nrows,ncols,5)
+        plot(t,y(:,5),'linewidth',lw,'color',c1)
+        ylabel('N_{al}', 'fontsize', f.ylab)
+        xlabel('t', 'fontsize', f.xlab)
+        title('[ALD] (normalized)', 'fontsize', f.title)
+        grid on
+        yLimits = ylim;
+        yDiff = diff(yLimits);
+        if yDiff < 1
+            ylim([yLimits(1) - 0.5 yLimits(1)+0.5])
+        end
         
     end
     

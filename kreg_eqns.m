@@ -6,6 +6,7 @@ M_Kgut    = y(1); % amount of K in gut
 M_Kplas   = y(2); % amount of K in plasma
 M_Kinter  = y(3); % amount of K in interstitial space
 M_Kmuscle = y(4); % amount of K in muscle
+N_al      = y(5); % normalized ALD
 
 
 %% set parameter names
@@ -35,9 +36,11 @@ B_cdKsec = params(23);
 alpha_TGF = params(24);
 A_cdKreab = params(25);
 ALD_eq = params(26);
-m_K_ALDO = params(27);
-FF = params(28);
-A_insulin = params(29);
+T_al = params(27);
+Csod = params(28);
+xi_par = params(29);
+FF = params(30);
+A_insulin = params(31);
 
 %% Get variable inputs
 % default settings, varargin is used to change settings
@@ -100,10 +103,9 @@ K_inter   = M_Kinter/V_interstitial; % interstitial K concentration
 K_muscle  = M_Kmuscle/V_muscle; % intracellular K concentration
 K_ECFtot  = (M_Kplas + M_Kinter)/(V_plasma + V_interstitial); % total ECF concentration
 
-%% ALD (N_al)
-% equation from Maddah & Hallow 2022
-N_al = exp(m_K_ALDO * (K_ECFtot - Kecf_total));
+% ALD depends on N_al
 C_al = N_al*ALD_eq;
+
 
 %% Gut K (M_Kgut)
 if SS
@@ -212,5 +214,11 @@ dydt(3) = Plas2ECF - Inter2Muscle + Muscle2Inter;
 
 %% Intracellular K (M_Kmuscle)
 dydt(4) = Inter2Muscle - Muscle2Inter;
+
+%% ALD (N_al)
+xi_ksod = max(0,((K_ECFtot/Csod)/(Kecf_total/144/(xi_par+1))-xi_par));
+N_als = xi_ksod; % NOTE: K+ equation only depends on xi_ksod, BP equation has others (xi_map, xi_at)
+
+dydt(5) = (1/T_al) * (N_als - N_al);
 
 end

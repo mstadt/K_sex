@@ -28,7 +28,7 @@ end
 %% baseline concentrations
 Kecf_baseline      = 4.3;% baseline ECF K concentration (total) mEq/L
 pars.Kecf_total    = 4.2;
-pars.P_ECF             = 0.3; % this parameter will have to be fit I think
+pars.P_ECF         = 0.3; % this parameter will have to be fit I think
 
 pars.Kmuscle_baseline       = 130; % baseline muscle concentration mEq/L
 %% NKA activity values
@@ -108,11 +108,11 @@ else  % female
     pars.ALD_eq = 69.2; % ng/L
 end
 
-% pars.T_al = 60; % ALD half life (min)
-% pars.Csod = 144; % sodium concentration mEq/L
-% pars.xi_par = 2; %lower xi_pars makes C_al less sensitive
+pars.T_al = 60; % ALD half life (min)
+pars.Csod = 144; % sodium concentration mEq/L
+pars.xi_par = 2; %lower xi_pars makes C_al less sensitive
 
-pars.m_K_ALDO = 0.5; %951.2/1000; % adjust for mL to L
+%pars.m_K_ALDO = 0.5; %951.2/1000; % adjust for mL to L
 
 %% effects
 pars.FF = 0.250274; 
