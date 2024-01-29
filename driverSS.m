@@ -11,14 +11,19 @@ clear all;
 %--------------
 
 %% initialize parameter values
-% sex = 0; % male
+%sex = 0; % male
 sex = 1; % female
 fprintf('loading params \n')
 pars = set_params(sex);
 [params, parnames] = pars2vector(pars,0);
 
 %% set initial conditions
-temp = load('./SS/SS_4vars.mat');
+if sex == 0 % male
+    temp = load('./SS/SS_5vars_male.mat');
+elseif sex == 1 % female
+    %temp = load('./SS/SS_5vars_female.mat');
+    temp = load('./SS/SS_5vars.mat');
+end
 IC = temp.SS;
 [SS, exitflag, residual] = getSS(IC, sex, params,...
                                     'do_figs', true); % show figs?
@@ -37,6 +42,7 @@ if printSS
    fprintf('M_Kplas        %0.4f\n', SS(2))
    fprintf('M_Kinter       %0.4f\n', SS(3))
    fprintf('M_Kmuscle      %0.4f\n', SS(4))
+   fprintf('N_al           %0.4f\n', SS(5))
    fprintf('\n')
    fprintf('K_plas         %0.4f\n', SS(2)/pars.V_plasma)
    fprintf('K_inter        %0.4f\n', SS(3)/pars.V_interstitial)
